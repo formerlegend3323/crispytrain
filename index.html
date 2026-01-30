@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop HTML Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            text-align: center;
+            border: 2px dashed #007BFF;
+            padding: 20px;
+            width: 300px;
+            background-color: #fff;
+        }
+        .container p {
+            font-size: 16px;
+            color: #333;
+        }
+        .container input {
+            margin-top: 20px;
+        }
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="drop-zone">
+        <p>Drag & Drop HTML File Here</p>
+        <input type="file" id="fileInput" accept=".html">
+        <button class="btn" id="openBtn">Open in New Tab</button>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('fileInput');
+        const openBtn = document.getElementById('openBtn');
+        let htmlContent = '';
+
+        // Prevent default behaviors for drag events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#0056b3';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#007BFF';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#007BFF';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'text/html') {
+                readFile(file);
+            }
+        });
+
+        // File input change event
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === 'text/html') {
+                readFile(file);
+            }
+        });
+
+        function readFile(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                htmlContent = e.target.result;
+                console.log('File read successfully');
+            };
+            reader.readAsText(file);
+        }
+
+        // Open the HTML content in a new about:blank tab
+        openBtn.addEventListener('click', () => {
+            if (htmlContent) {
+                const newTab = window.open('about:blank', '_blank');
+                newTab.document.write(htmlContent);
+                newTab.document.close();
+            } else {
+                alert('Please upload an HTML file first.');
+            }
+        });
+    </script>
+</body>
+</html>
