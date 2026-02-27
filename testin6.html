@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HTML Loader</title>
+<style>
+body{font-family:Arial,display:flex,justify-content:center,align-items:center,height:100vh;margin:0}
+.container{text-align:center;border:2px dashed #007BFF;padding:20px}
+</style>
+</head>
+<body>
+
+<div class="container">
+<p>Drag & Drop HTML File Here</p>
+<input type="file" id="fileInput" accept=".html">
+<br><br>
+<button id="openBtn">Load</button>
+</div>
+
+<script>
+(function(){
+
+const fileInput=document.getElementById("fileInput");
+const openBtn=document.getElementById("openBtn");
+
+let htmlText="";
+
+fileInput.addEventListener("change",e=>{
+const f=e.target.files[0];
+if(!f)return;
+const r=new FileReader();
+r.onload=ev=>htmlText=ev.target.result;
+r.readAsText(f);
+});
+
+openBtn.addEventListener("click",()=>{
+
+if(!htmlText){alert("Pick a file first.");return;}
+
+const self=document.currentScript;
+if(self)self.remove();
+
+const p=new DOMParser();
+const d=p.parseFromString(htmlText,"text/html");
+
+const base=d.createElement("base");
+
+base.href=location.href;
+
+const h=d.querySelector("head");
+if(h)h.prepend(base);
+
+document.documentElement.innerHTML=d.documentElement.innerHTML;
+
+d.querySelectorAll("script").forEach(s=>{
+const ns=document.createElement("script");
+for(const a of s.attributes)ns.setAttribute(a.name,a.value);
+const raw=s.getAttribute("src");
+if(raw)ns.src=raw;
+else ns.textContent=s.textContent;
+document.body.appendChild(ns);
+});
+
+});
+
+})();
+</script>
+
+</body>
+</html>
