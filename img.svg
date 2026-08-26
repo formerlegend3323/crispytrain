@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     width="100%"
+     height="100%"
+     viewBox="0 0 800 600">
+
+  <foreignObject x="0" y="0" width="100%" height="100%">
+    <xhtml:html>
+      <xhtml:head>
+        <xhtml:meta charset="UTF-8"/>
+        <xhtml:meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <xhtml:style>
+          html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+          }
+
+          body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f7f7f7;
+          }
+
+          .container {
+            text-align: center;
+            border: 2px dashed #007BFF;
+            padding: 20px;
+            width: 300px;
+            background-color: #fff;
+          }
+
+          .container p {
+            font-size: 16px;
+            color: #333;
+          }
+
+          .container input {
+            margin-top: 20px;
+          }
+
+          .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+          }
+
+          .btn:hover {
+            background-color: #0056b3;
+          }
+        </xhtml:style>
+      </xhtml:head>
+
+      <xhtml:body>
+
+        <xhtml:div class="container" id="drop-zone">
+
+          <xhtml:p>Drag &amp; Drop HTML File Here</xhtml:p>
+
+          <xhtml:input
+            type="file"
+            id="fileInput"
+            accept=".html,text/html"/>
+
+          <xhtml:button class="btn" id="openBtn">
+            Open in New Tab
+          </xhtml:button>
+
+        </xhtml:div>
+
+      </xhtml:body>
+    </xhtml:html>
+  </foreignObject>
+
+  <script type="application/ecmascript"><![CDATA[
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('fileInput');
+    const openBtn = document.getElementById('openBtn');
+
+    let htmlContent = '';
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#0056b3';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = '#007BFF';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+
+      dropZone.style.borderColor = '#007BFF';
+
+      const file = e.dataTransfer.files[0];
+
+      if (file && (
+        file.type === 'text/html' ||
+        file.name.toLowerCase().endsWith('.html')
+      )) {
+        readFile(file);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+
+      const file = e.target.files[0];
+
+      if (file && (
+        file.type === 'text/html' ||
+        file.name.toLowerCase().endsWith('.html')
+      )) {
+        readFile(file);
+      }
+
+    });
+
+    function readFile(file) {
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+
+        htmlContent = e.target.result;
+
+        console.log('File read successfully');
+
+      };
+
+      reader.readAsText(file);
+
+    }
+
+    openBtn.addEventListener('click', () => {
+
+      if (!htmlContent) {
+        alert('Please upload an HTML file first.');
+        return;
+      }
+
+      const newTab = window.open('about:blank', '_blank');
+
+      if (!newTab) {
+        alert('Please allow popups for this site.');
+        return;
+      }
+
+      newTab.document.open();
+      newTab.document.write(htmlContent);
+      newTab.document.close();
+
+    });
+
+  ]]></script>
+
+</svg>
