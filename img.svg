@@ -129,15 +129,11 @@
       const reader = new FileReader();
 
       reader.onload = function(e) {
-
         htmlContent = e.target.result;
-
         console.log('File read successfully');
-
       };
 
       reader.readAsText(file);
-
     }
 
     openBtn.addEventListener('click', () => {
@@ -147,6 +143,10 @@
         return;
       }
 
+      /*
+       * Open a fresh about:blank tab.
+       * The HTML is then written into that document.
+       */
       const newTab = window.open('about:blank', '_blank');
 
       if (!newTab) {
@@ -154,9 +154,15 @@
         return;
       }
 
-      newTab.document.open();
-      newTab.document.write(htmlContent);
-      newTab.document.close();
+      try {
+        newTab.document.open();
+        newTab.document.write(htmlContent);
+        newTab.document.close();
+      } catch (error) {
+        newTab.close();
+        alert('Could not open the HTML file.');
+        console.error(error);
+      }
 
     });
 
