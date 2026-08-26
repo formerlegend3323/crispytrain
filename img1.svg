@@ -8,7 +8,8 @@
     <xhtml:html>
       <xhtml:head>
         <xhtml:meta charset="UTF-8"/>
-        <xhtml:meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <xhtml:meta name="viewport"
+                    content="width=device-width, initial-scale=1.0"/>
 
         <xhtml:style>
           html, body {
@@ -31,6 +32,7 @@
             padding: 20px;
             width: 300px;
             background-color: #fff;
+            box-sizing: border-box;
           }
 
           .container p {
@@ -62,14 +64,18 @@
 
         <xhtml:div class="container" id="drop-zone">
 
-          <xhtml:p>Drag &amp; Drop HTML File Here</xhtml:p>
+          <xhtml:p>
+            Drag &amp; Drop HTML File Here
+          </xhtml:p>
 
           <xhtml:input
             type="file"
             id="fileInput"
             accept=".html,text/html"/>
 
-          <xhtml:button class="btn" id="openBtn">
+          <xhtml:button
+            class="btn"
+            id="openBtn">
             Open in New Tab
           </xhtml:button>
 
@@ -87,82 +93,131 @@
 
     let htmlContent = '';
 
+    function readFile(file) {
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+
+        htmlContent = e.target.result;
+
+        console.log('File read successfully');
+
+      };
+
+      reader.onerror = function() {
+
+        htmlContent = '';
+
+        alert('Could not read the HTML file.');
+
+      };
+
+      reader.readAsText(file);
+
+    }
+
     dropZone.addEventListener('dragover', (e) => {
+
       e.preventDefault();
+
       dropZone.style.borderColor = '#0056b3';
+
     });
 
     dropZone.addEventListener('dragleave', () => {
+
       dropZone.style.borderColor = '#007BFF';
+
     });
 
     dropZone.addEventListener('drop', (e) => {
+
       e.preventDefault();
 
       dropZone.style.borderColor = '#007BFF';
 
       const file = e.dataTransfer.files[0];
 
-      if (file && (
-        file.type === 'text/html' ||
-        file.name.toLowerCase().endsWith('.html')
-      )) {
+      if (
+        file &&
+        (
+          file.type === 'text/html' ||
+          file.name.toLowerCase().endsWith('.html')
+        )
+      ) {
+
         readFile(file);
+
+      } else {
+
+        alert('Please drop an HTML file.');
+
       }
+
     });
 
     fileInput.addEventListener('change', (e) => {
 
       const file = e.target.files[0];
 
-      if (file && (
-        file.type === 'text/html' ||
-        file.name.toLowerCase().endsWith('.html')
-      )) {
+      if (
+        file &&
+        (
+          file.type === 'text/html' ||
+          file.name.toLowerCase().endsWith('.html')
+        )
+      ) {
+
         readFile(file);
+
       }
 
     });
 
-    function readFile(file) {
-
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        htmlContent = e.target.result;
-        console.log('File read successfully');
-      };
-
-      reader.readAsText(file);
-    }
-
     openBtn.addEventListener('click', () => {
 
       if (!htmlContent) {
+
         alert('Please upload an HTML file first.');
+
         return;
+
       }
 
       /*
-       * Open a fresh about:blank tab.
-       * The HTML is then written into that document.
+       * Create a temporary HTML document.
+       * The browser loads this as its own document,
+       * rather than trying to render the HTML inside the SVG.
        */
-      const newTab = window.open('about:blank', '_blank');
+      const blob = new Blob(
+        [htmlContent],
+        { type: 'text/html' }
+      );
+
+      const url = URL.createObjectURL(blob);
+
+      const newTab = window.open(url, '_blank');
 
       if (!newTab) {
+
+        URL.revokeObjectURL(url);
+
         alert('Please allow popups for this site.');
+
         return;
+
       }
 
-      try {
-        newTab.document.open();
-        newTab.document.write(htmlContent);
-        newTab.document.close();
-      } catch (error) {
-        newTab.close();
-        alert('Could not open the HTML file.');
-        console.error(error);
-      }
+      /*
+       * Keep the Blob URL alive long enough for the
+       * new document to load.
+       */
+      setTimeout(() => {
+
+        URL.revokeObjectURL(url);
+
+      }, 60000);
 
     });
 
