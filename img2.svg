@@ -190,14 +190,8 @@
        * The browser loads this as its own document,
        * rather than trying to render the HTML inside the SVG.
        */
-      const blob = new Blob(
-        [htmlContent],
-        { type: 'text/html' }
-      );
-
-      const url = URL.createObjectURL(blob);
-
-      const newTab = window.open(url, '_blank');
+     const url = "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent);
+const newTab = window.open(url, "_blank");
 
       if (!newTab) {
 
