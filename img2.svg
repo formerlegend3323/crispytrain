@@ -1,142 +1,127 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
-<svg
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    width="500"
-    height="360"
-    viewBox="0 0 500 360"
->
-    <foreignObject x="0" y="0" width="500" height="360">
-        <xhtml:div style="
-            width:500px;
-            height:360px;
-            box-sizing:border-box;
-            padding:30px;
-            background:#f7f7f7;
-            font-family:Arial,sans-serif;
-        ">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="500"
+     height="300"
+     viewBox="0 0 500 300">
 
-            <xhtml:div id="box" style="
-                width:340px;
-                margin:auto;
-                margin-top:70px;
-                padding:25px;
-                box-sizing:border-box;
-                background:white;
-                border:2px dashed #007BFF;
-                border-radius:10px;
-                text-align:center;
-            ">
+    <rect width="500" height="300" fill="#f7f7f7"/>
 
-                <xhtml:div style="
-                    font-size:18px;
-                    font-weight:bold;
-                    margin-bottom:15px;
-                ">
-                    Local HTML Runner
-                </xhtml:div>
+    <rect x="75" y="55"
+          width="350"
+          height="190"
+          rx="12"
+          fill="white"
+          stroke="#007BFF"
+          stroke-width="2"
+          stroke-dasharray="8 6"/>
 
-                <xhtml:input
-                    id="file"
-                    type="file"
-                    accept=".html,.htm,text/html"
-                    style="width:100%;"
-                />
+    <text x="250"
+          y="105"
+          text-anchor="middle"
+          font-family="Arial, sans-serif"
+          font-size="20"
+          fill="#222">
+        Local HTML Runner
+    </text>
 
-                <xhtml:div id="status" style="
-                    margin-top:15px;
-                    font-size:13px;
-                    color:#666;
-                ">
-                    Select an HTML file
-                </xhtml:div>
+    <text id="status"
+          x="250"
+          y="140"
+          text-anchor="middle"
+          font-family="Arial, sans-serif"
+          font-size="14"
+          fill="#666">
+        Select an HTML file
+    </text>
 
-                <xhtml:button
-                    id="run"
-                    style="
-                        margin-top:15px;
-                        padding:10px 22px;
-                        border:0;
-                        border-radius:5px;
-                        background:#007BFF;
-                        color:white;
-                        cursor:pointer;
-                        font-size:15px;
-                    "
-                >
-                    Run HTML
-                </xhtml:button>
+    <rect id="button"
+          x="155"
+          y="165"
+          width="190"
+          height="50"
+          rx="7"
+          fill="#007BFF"
+          cursor="pointer"/>
 
-            </xhtml:div>
-
-        </xhtml:div>
-    </foreignObject>
+    <text x="250"
+          y="197"
+          text-anchor="middle"
+          font-family="Arial, sans-serif"
+          font-size="16"
+          fill="white"
+          pointer-events="none">
+        Choose HTML File
+    </text>
 
     <script><![CDATA[
 
-        const fileInput =
-            document.getElementById("file");
+        const svg = document.documentElement;
+        const button = document.getElementById("button");
+        const status = document.getElementById("status");
 
-        const runButton =
-            document.getElementById("run");
+        /*
+         * Create a normal HTML file input dynamically.
+         * Nothing HTML is embedded in the SVG itself.
+         */
+        const input = document.createElementNS(
+            "http://www.w3.org/1999/xhtml",
+            "input"
+        );
 
-        const status =
-            document.getElementById("status");
+        input.type = "file";
+        input.accept = ".html,.htm,text/html";
 
-        let selectedFile = null;
+        /*
+         * Keep it invisible.
+         */
+        input.style.position = "fixed";
+        input.style.left = "-10000px";
+        input.style.top = "-10000px";
+
+        document.body.appendChild(input);
 
 
-        fileInput.addEventListener("change", function () {
-
-            selectedFile = fileInput.files[0];
-
-            if (!selectedFile) {
-                status.textContent =
-                    "Select an HTML file";
-                return;
-            }
-
-            status.textContent =
-                "Selected: " + selectedFile.name;
+        /*
+         * Clicking the SVG button opens the normal
+         * browser file picker.
+         */
+        button.addEventListener("click", function () {
+            input.click();
         });
 
 
-        runButton.addEventListener("click", function () {
+        /*
+         * User selected an HTML file.
+         */
+        input.addEventListener("change", function () {
 
-            if (!selectedFile) {
-                alert("Select an HTML file first.");
+            const file = input.files[0];
+
+            if (!file) {
                 return;
             }
 
-
-            /*
-             * Do NOT parse the HTML ourselves.
-             *
-             * Do NOT put it into SVG.innerHTML.
-             *
-             * Give the browser the HTML file as an actual
-             * top-level HTML document instead.
-             */
-
-            const htmlURL =
-                URL.createObjectURL(selectedFile);
+            status.textContent = "Loading " + file.name + "...";
 
 
             /*
-             * Replace the SVG in the current tab.
+             * Turn the selected file into a Blob URL.
              */
-            window.location.replace(htmlURL);
+            const url = URL.createObjectURL(file);
 
 
             /*
-             * Do not revoke the URL here.
+             * Replace THIS tab with the HTML document.
              *
-             * The browser needs it to load the new document.
+             * No new tab.
+             * No server.
+             * No iframe.
+             * No XML/HTML parsing by us.
              */
+            window.location.href = url;
+
         });
 
     ]]></script>
 
 </svg>
-```
