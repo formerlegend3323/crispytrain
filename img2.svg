@@ -1,66 +1,75 @@
+# Local SVG HTML Runner
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-     width="600"
-     height="450"
-     viewBox="0 0 600 450">
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    width="500"
+    height="360"
+    viewBox="0 0 500 360"
+>
+    <foreignObject x="0" y="0" width="500" height="360">
+        <xhtml:div style="
+            width:500px;
+            height:360px;
+            box-sizing:border-box;
+            padding:30px;
+            background:#f7f7f7;
+            font-family:Arial,sans-serif;
+        ">
 
-    <foreignObject x="0" y="0" width="600" height="450">
-        <xhtml:div xmlns="http://www.w3.org/1999/xhtml"
-                  style="width:100%;height:100%;font-family:Arial,sans-serif;">
+            <xhtml:div id="box" style="
+                width:340px;
+                margin:auto;
+                margin-top:70px;
+                padding:25px;
+                box-sizing:border-box;
+                background:white;
+                border:2px dashed #007BFF;
+                border-radius:10px;
+                text-align:center;
+            ">
 
-            <xhtml:div id="launcher"
-                       style="
-                           width:100%;
-                           height:100%;
-                           display:flex;
-                           align-items:center;
-                           justify-content:center;
-                           background:#f7f7f7;
-                       ">
-
-                <xhtml:div id="dropZone"
-                           style="
-                               width:340px;
-                               padding:25px;
-                               text-align:center;
-                               background:white;
-                               border:2px dashed #007BFF;
-                               border-radius:10px;
-                           ">
-
-                    <xhtml:p>
-                        Drag &amp; Drop HTML File Here
-                    </xhtml:p>
-
-                    <xhtml:input
-                        id="fileInput"
-                        type="file"
-                        accept=".html,.htm,text/html"/>
-
-                    <xhtml:br/>
-                    <xhtml:br/>
-
-                    <xhtml:button id="openBtn">
-                        Run HTML
-                    </xhtml:button>
-
-                    <xhtml:p id="status"
-                             style="font-size:13px;color:#666;">
-                        No file selected
-                    </xhtml:p>
-
+                <xhtml:div style="
+                    font-size:18px;
+                    font-weight:bold;
+                    margin-bottom:15px;
+                ">
+                    Local HTML Runner
                 </xhtml:div>
-            </xhtml:div>
 
-            <!-- Uploaded HTML gets rendered here -->
-            <xhtml:div id="app"
-                       style="
-                           display:none;
-                           width:100%;
-                           height:100%;
-                           overflow:auto;
-                       ">
+                <xhtml:input
+                    id="file"
+                    type="file"
+                    accept=".html,.htm,text/html"
+                    style="width:100%;"
+                />
+
+                <xhtml:div id="status" style="
+                    margin-top:15px;
+                    font-size:13px;
+                    color:#666;
+                ">
+                    Select an HTML file
+                </xhtml:div>
+
+                <xhtml:button
+                    id="run"
+                    style="
+                        margin-top:15px;
+                        padding:10px 22px;
+                        border:0;
+                        border-radius:5px;
+                        background:#007BFF;
+                        color:white;
+                        cursor:pointer;
+                        font-size:15px;
+                    "
+                >
+                    Run HTML
+                </xhtml:button>
+
             </xhtml:div>
 
         </xhtml:div>
@@ -69,109 +78,67 @@
     <script><![CDATA[
 
         const fileInput =
-            document.getElementById("fileInput");
+            document.getElementById("file");
 
-        const openBtn =
-            document.getElementById("openBtn");
-
-        const launcher =
-            document.getElementById("launcher");
-
-        const app =
-            document.getElementById("app");
+        const runButton =
+            document.getElementById("run");
 
         const status =
             document.getElementById("status");
 
-        let htmlContent = "";
+        let selectedFile = null;
 
-        fileInput.addEventListener("change", async (event) => {
 
-            const file = event.target.files[0];
+        fileInput.addEventListener("change", function () {
 
-            if (!file) return;
+            selectedFile = fileInput.files[0];
 
-            htmlContent = await file.text();
+            if (!selectedFile) {
+                status.textContent =
+                    "Select an HTML file";
+                return;
+            }
 
             status.textContent =
-                "Loaded: " + file.name;
+                "Selected: " + selectedFile.name;
         });
 
 
-        openBtn.addEventListener("click", async () => {
+        runButton.addEventListener("click", function () {
 
-            if (!htmlContent) {
+            if (!selectedFile) {
                 alert("Select an HTML file first.");
                 return;
             }
 
-            /*
-             * Parse the uploaded HTML.
-             */
-            const parser = new DOMParser();
-
-            const parsed =
-                parser.parseFromString(
-                    htmlContent,
-                    "text/html"
-                );
-
 
             /*
-             * Copy the HTML body into our SVG app.
+             * Do NOT parse the HTML ourselves.
+             *
+             * Do NOT put it into SVG.innerHTML.
+             *
+             * Give the browser the HTML file as an actual
+             * top-level HTML document instead.
              */
-            app.innerHTML = parsed.body.innerHTML;
+
+            const htmlURL =
+                URL.createObjectURL(selectedFile);
 
 
             /*
-             * Copy the CSS from the uploaded document.
+             * Replace the SVG in the current tab.
              */
-            for (const style of parsed.querySelectorAll("style")) {
-
-                const newStyle =
-                    document.createElementNS(
-                        "http://www.w3.org/1999/xhtml",
-                        "style"
-                    );
-
-                newStyle.textContent =
-                    style.textContent;
-
-                app.prepend(newStyle);
-            }
+            window.location.replace(htmlURL);
 
 
             /*
-             * Show the application.
+             * Do not revoke the URL here.
+             *
+             * The browser needs it to load the new document.
              */
-            launcher.style.display = "none";
-            app.style.display = "block";
-
-
-            /*
-             * Execute scripts from the uploaded HTML.
-             */
-            for (const oldScript of
-                 parsed.querySelectorAll("script")) {
-
-                const script =
-                    document.createElementNS(
-                        "http://www.w3.org/1999/xhtml",
-                        "script"
-                    );
-
-                if (oldScript.src) {
-                    script.src = oldScript.src;
-                } else {
-                    script.textContent =
-                        oldScript.textContent;
-                }
-
-                document.documentElement.appendChild(script);
-            }
-
         });
 
     ]]></script>
 
 </svg>
+```
