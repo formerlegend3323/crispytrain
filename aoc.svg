@@ -32,7 +32,1625 @@
         CDATA keeps the HTML from being parsed as XML.
     -->
     <metadata id="html-app"><![CDATA[
-PASTE YOUR ENTIRE <!DOCTYPE html> ... </html> HERE
+<!DOCTYPE html>
+
+<html lang="en">
+<!-- may aphrodite have mercy on my soul, this shit was hard -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AES on Crack Encryptor</title>
+<style>
+body{margin:0;font-family:"Tahoma","Verdana",sans-serif;background:url("https://www.transparenttextures.com/patterns/cubes.png"),linear-gradient(to bottom,#0a2a6b,#1b4fa3);color:#000}
+.layout{display:flex;gap:10px;max-width:850px;margin:30px auto;align-items:flex-start;padding:0 10px;box-sizing:border-box}
+.container{width:480px;max-width:100%;background:#d4d0c8;border:3px solid #fff;border-right-color:#808080;border-bottom-color:#808080;box-shadow:4px 4px 0 #000;padding:10px;box-sizing:border-box}
+.cardPanel{width:300px;max-width:100%;background:#d4d0c8;border:3px solid #fff;border-right-color:#808080;border-bottom-color:#808080;box-shadow:4px 4px 0 #000;padding:10px;box-sizing:border-box}
+h2{margin:-10px -10px 10px;padding:6px;background:linear-gradient(to right,#000080,#1084d0);color:#fff;font-size:14px;font-weight:bold}
+textarea,input,select{width:calc(100% - 12px);margin-bottom:8px;padding:6px;border:2px inset #fff;background:#fff;font-family:Tahoma;font-size:12px;box-sizing:border-box}
+textarea{resize:none}
+button{padding:6px 10px;margin:3px 0;border:2px outset #fff;background:#d4d0c8;font-family:Tahoma;font-size:12px;cursor:pointer}button:active{border:2px inset #fff}
+.output{margin-top:8px;padding:6px;background:#fff;border:2px inset #fff;font-size:11px;word-break:break-all}
+.small{font-size:10px;color:#333;margin-top:6px}.status{min-height:14px;font-size:10px;margin-top:5px;color:#333}
+.dropzone{margin:8px 0;padding:18px 8px;text-align:center;background:#efefef;border:2px dashed #808080;font-size:11px;cursor:pointer}.dropzone.dragover{background:#d0e7ff;border-color:#000080}
+.cardDropzone{margin:8px 0;padding:15px 8px;text-align:center;background:#efefef;border:2px dashed #808080;font-size:11px;cursor:pointer}
+.cardDropzone.dragover{background:#d0e7ff;border-color:#000080}
+.cardInfo{margin-top:8px;padding:7px;background:#fff;border:2px inset #fff;font-size:10px;line-height:1.5}
+.rankBadge{font-size:24px;font-weight:bold;text-align:center;margin:6px 0}
+.warning{padding:7px;background:#fff0c0;border:2px inset #fff;font-size:10px;margin-bottom:8px}
+.carrierDropzone{margin:8px 0;padding:15px 8px;text-align:center;background:#efefef;border:2px dashed #808080;font-size:11px;cursor:pointer}
+.carrierDropzone.dragover{background:#d0e7ff;border-color:#000080}
+.carrierInfo{margin-top:6px;padding:6px;background:#fff;border:2px inset #fff;font-size:10px;line-height:1.4}
+@media(max-width:820px){
+.layout{display:block;margin:15px auto}
+.container,.cardPanel{width:100%;max-width:480px;margin:0 auto 10px}
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<div class="container">
+<h2>AES on Crack 🔐</h2>
+
+<textarea id="input" placeholder="Enter text..."></textarea>
+
+<input id="wordKeyInput" type="password" placeholder="Optional Word Key (not stored in output file)">
+
+<label class="small">Encryption Clearance</label> <select id="targetRank"></select>
+
+<div class="row">
+<button onclick="encrypt()">Encrypt</button>
+<button onclick="decrypt()">Decrypt</button>
+<button onclick="downloadCrack()">Download PNG</button>
+<button onclick="clearAll()">Clear</button>
+</div>
+
+<input id="keyInput" placeholder="Paste key">
+
+<div id="dropZone" class="dropzone">
+Drop encrypted PNG here<br>or click to choose one
+</div>
+
+<input id="crackFileInput" type="file" accept=".png,image/png" style="display:none">
+
+<button onclick="copyOutput('encrypted')">Copy Encrypted</button> <button onclick="copyOutput('key')">Copy Key</button> <button onclick="copyOutput('decrypted')">Copy Decrypted</button>
+
+<div class="status" id="status"></div>
+
+<div class="output"><b>Encrypted text:</b><br><span id="encrypted"></span></div>
+<div class="output"><b>Key:</b><br><span id="key"></span></div>
+<div class="output"><b>Decrypted text:</b><br><span id="decrypted"></span></div>
+
+<p class="small">AES-GCM + chaos layer (TM) + optional Word Key + PNG carrier</p>
+</div>
+
+<div class="cardPanel">
+<h2>🔑 Machine Card</h2>
+
+<div class="warning">
+<b>CARD REQUIRED.</b><br>
+Your machine card determines what clearance levels you may use.
+</div>
+
+<div id="cardDropZone" class="cardDropzone">
+Drop Key Card PNG here<br>or click to choose one
+</div>
+
+<input id="cardFileInput" type="file" accept=".png,image/png" style="display:none">
+
+<div class="cardInfo" id="cardInfo">
+No machine card loaded.
+</div>
+
+<button onclick="clearCard()">Remove Card</button>
+
+<hr>
+
+<h2>🖼️ PNG Carrier</h2>
+
+<div id="carrierDropZone" class="carrierDropzone">
+Drop your PNG here<br>or click to choose one
+</div>
+
+<input id="carrierFileInput" type="file" accept=".png,image/png" style="display:none">
+
+<div class="carrierInfo" id="carrierInfo">
+<b>DEFAULT:</b> flippy.png
+</div>
+
+<button onclick="clearCarrier()">Use Default Flippy</button>
+
+<p class="small">
+Your selected PNG becomes the carrier for encrypted messages.
+If no PNG is selected, flippy.png is used automatically.
+</p>
+
+<p class="small">
+ECDSA P-256 signed machine cards.<br>
+Cards cannot simply be edited because their signature would become invalid.
+</p>
+</div>
+
+</div>
+
+<script>
+const alphabet="abcdefghijklmnopqrstuvwxyz";
+const symbols="!@#$%^&*()-_=+[]{};:'\"\\|,.<>/?`~";
+
+const PNG_SIGNATURE=new Uint8Array([137,80,78,71,13,10,26,10]);
+
+const META_KEY="AES_ON_CRACK";
+const CARD_META_KEY="AOC_KEYCARD";
+
+const enc=new TextEncoder(),dec=new TextDecoder();
+
+let basePngBytes=null;
+let currentPayload=null;
+let loadedPayload=null;
+let machineCard=null;
+
+
+/* =========================
+   PUBLIC CARD VERIFICATION KEY
+   ========================= */
+
+const PUBLIC_KEY_PEM=`-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAECohS+UO+e2xMYk0CzBLhsoTkBJDW
+M6ic7tUZSkZ9nI2e2w6oZooef0dkrldb/M5KYymQdul7Q8vQjDrgjEa/TA==
+-----END PUBLIC KEY-----`;
+
+
+/* =========================
+   RANK SYSTEM
+   ========================= */
+
+const RANKS={
+1:"MASTER",
+2:"HIGH",
+3:"STANDARD",
+4:"LIMITED",
+5:"BASIC"
+};
+
+function allowedTargetRanks(rank){
+return Array.from({length:6-rank},(_,i)=>rank+i);
+}
+
+function updateRankDropdown(){
+const select=document.getElementById("targetRank");
+select.innerHTML="";
+
+if(!machineCard){
+select.disabled=true;
+return;
+}
+
+select.disabled=false;
+
+for(const rank of allowedTargetRanks(machineCard.rank)){
+const option=document.createElement("option");
+option.value=rank;
+option.textContent="AOC-0"+rank+" — "+RANKS[rank];
+select.appendChild(option);
+}
+}
+
+
+/* =========================
+   STATUS
+   ========================= */
+
+function status(s,bad=false){
+const e=document.getElementById("status");
+e.textContent=s||"";
+e.style.color=bad?"#800000":"#333";
+}
+
+
+/* =========================
+   CRYPTO
+   ========================= */
+
+function randomBytes(n){
+return crypto.getRandomValues(new Uint8Array(n));
+}
+
+function toB64(u){
+let s="";
+for(let i=0;i<u.length;i+=0x8000)
+s+=String.fromCharCode(...u.subarray(i,i+0x8000));
+return btoa(s);
+}
+
+function fromB64(s){
+const b=atob(s),u=new Uint8Array(b.length);
+for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+return u;
+}
+
+function shuffle(s){
+return s.split('').sort(()=>Math.random()-.5).join('');
+}
+
+function randomSymbolString(n){
+return Array.from(
+{length:n},
+()=>symbols[Math.floor(Math.random()*symbols.length)]
+).join('');
+}
+
+function randomNumbers(n){
+return Array.from(
+{length:n},
+()=>Math.floor(Math.random()*100)
+);
+}
+
+function vigenereChar(c,k,a){
+const i=a.indexOf(c),j=a.indexOf(k);
+return i<0||j<0?c:a[(i+j)%a.length];
+}
+
+
+/* =========================
+   CHAOS LAYER
+   ========================= */
+
+function chaosEncrypt(text){
+const a1=shuffle(alphabet);
+const a2=shuffle(alphabet);
+const sk=randomSymbolString(text.length);
+const nums=randomNumbers(text.length);
+
+let s1="";
+
+for(let i=0;i<text.length;i++){
+const c=text[i];
+
+if(alphabet.includes(c))
+s1+=vigenereChar(c,a1[i%26],a1);
+
+else if(symbols.includes(c)){
+const x=symbols.indexOf(c);
+const k=symbols.indexOf(sk[i]);
+s1+=symbols[(x+k)%symbols.length];
+}
+
+else
+s1+=c;
+}
+
+let s2="";
+
+for(let i=0;i<s1.length;i++){
+const c=s1[i],x=a2.indexOf(c);
+
+if(x!==-1){
+const sh=nums[i]%26;
+s2+=a2[
+i%2===0
+?(x+sh)%26
+:(x-sh+26)%26
+];
+}
+else
+s2+=c;
+}
+
+return{
+step2:s2,
+alpha1:a1,
+alpha2:a2,
+symKey:sk,
+nums
+};
+}
+
+
+function chaosDecrypt(data,key){
+const{
+alpha1:a1,
+alpha2:a2,
+symKey:sk,
+nums
+}=key;
+
+let s1="";
+
+for(let i=0;i<data.length;i++){
+const c=data[i],x=a2.indexOf(c);
+
+if(x!==-1){
+const sh=nums[i]%26;
+
+s1+=a2[
+i%2===0
+?(x-sh+26)%26
+:(x+sh)%26
+];
+}
+else s1+=c;
+}
+
+let out="";
+
+for(let i=0;i<s1.length;i++){
+const c=s1[i];
+
+if(alphabet.includes(c)){
+const x=a1.indexOf(c);
+const k=a1[i%26];
+const ki=a1.indexOf(k);
+
+out+=a1[(x-ki+26)%26];
+}
+
+else if(symbols.includes(c)){
+const x=symbols.indexOf(c);
+const k=symbols.indexOf(sk[i]);
+
+out+=symbols[
+(x-k+symbols.length)%symbols.length
+];
+}
+
+else out+=c;
+}
+
+return out;
+}
+
+
+/* =========================
+   WORD KEY
+   ========================= */
+
+async function deriveWordKey(randomKey,word,salt){
+
+const pw=await crypto.subtle.importKey(
+"raw",
+enc.encode(word),
+"PBKDF2",
+false,
+["deriveBits"]
+);
+
+const wordBits=new Uint8Array(
+await crypto.subtle.deriveBits(
+{
+name:"PBKDF2",
+salt,
+iterations:210000,
+hash:"SHA-256"
+},
+pw,
+256
+)
+);
+
+const h=await crypto.subtle.importKey(
+"raw",
+randomKey,
+{name:"HMAC",hash:"SHA-256"},
+false,
+["sign"]
+);
+
+return new Uint8Array(
+await crypto.subtle.sign(
+"HMAC",
+h,
+new Uint8Array([...salt,...wordBits])
+)
+);
+}
+
+
+async function getAesKey(blob,word){
+
+const raw=fromB64(blob.key);
+
+if(!blob.wordProtected)
+return raw;
+
+if(!word)
+throw new Error("This message requires the Word Key.");
+
+if(!blob.salt)
+throw new Error("This message is missing part of its Word Key protection.");
+
+return deriveWordKey(
+raw,
+word,
+fromB64(blob.salt)
+);
+}
+
+
+/* =========================
+   PNG
+   ========================= */
+
+function readU32(b,o){
+return(
+(((b[o]<<24)>>>0)|
+(b[o+1]<<16)|
+(b[o+2]<<8)|
+b[o+3]
+)>>>0);
+}
+
+
+function crc32(b){
+
+let t=crc32.t;
+
+if(!t){
+t=crc32.t=new Uint32Array(256);
+
+for(let n=0;n<256;n++){
+let c=n;
+
+for(let k=0;k<8;k++)
+c=c&1
+?0xedb88320^(c>>>1)
+:c>>>1;
+
+t[n]=c>>>0;
+}
+}
+
+let c=0xffffffff;
+
+for(const x of b)
+c=t[(c^x)&255]^(c>>>8);
+
+return(c^0xffffffff)>>>0;
+}
+
+
+function u32(v){
+return new Uint8Array([
+(v>>>24)&255,
+(v>>>16)&255,
+(v>>>8)&255,
+v&255
+]);
+}
+
+
+function chunk(type,data){
+
+const tb=enc.encode(type);
+
+const body=new Uint8Array(
+tb.length+data.length
+);
+
+const out=new Uint8Array(
+12+data.length
+);
+
+body.set(tb);
+body.set(data,4);
+
+out.set(u32(data.length));
+out.set(tb,4);
+out.set(data,8);
+out.set(
+u32(crc32(body)),
+8+data.length
+);
+
+return out;
+}
+
+
+function metadataChunk(json){
+
+const k=enc.encode(META_KEY);
+const p=enc.encode(json);
+
+const d=new Uint8Array(
+k.length+1+p.length
+);
+
+d.set(k);
+d[k.length]=0;
+d.set(p,k.length+1);
+
+return chunk("tEXt",d);
+}
+
+
+function insertBeforeIEND(png,ch){
+
+for(let i=8;i+12<=png.length;){
+
+const len=readU32(png,i);
+
+const type=dec.decode(
+png.subarray(i+4,i+8)
+);
+
+if(type==="IEND"){
+
+const o=new Uint8Array(
+png.length+ch.length
+);
+
+o.set(png.subarray(0,i));
+o.set(ch,i);
+o.set(png.subarray(i),i+ch.length);
+
+return o;
+}
+
+i+=12+len;
+}
+
+throw new Error(
+"Invalid PNG: IEND not found."
+);
+}
+
+
+/* =========================
+   GENERIC METADATA READER
+   ========================= */
+
+function extractTextMetadata(png,keyword){
+
+if(
+png.length<8||
+!PNG_SIGNATURE.every(
+(x,i)=>png[i]===x
+)
+)
+throw new Error("Not a valid PNG.");
+
+for(let i=8;i+12<=png.length;){
+
+const len=readU32(png,i);
+
+const type=dec.decode(
+png.subarray(i+4,i+8)
+);
+
+if(i+12+len>png.length)
+break;
+
+if(type==="tEXt"){
+
+const d=png.subarray(
+i+8,
+i+8+len
+);
+
+const z=d.indexOf(0);
+
+if(
+z!==-1&&
+dec.decode(d.subarray(0,z))===keyword
+)
+return dec.decode(
+d.subarray(z+1)
+);
+}
+
+if(type==="IEND")
+break;
+
+i+=12+len;
+}
+
+throw new Error(
+"No "+keyword+" payload found in this PNG."
+);
+}
+
+
+/* =========================
+   CARD VERIFICATION
+   ========================= */
+
+function pemToArrayBuffer(pem){
+
+const b64=pem.replace(
+/-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\s/g,
+""
+);
+
+const bin=atob(b64);
+
+const bytes=new Uint8Array(
+bin.length
+);
+
+for(let i=0;i<bin.length;i++)
+bytes[i]=bin.charCodeAt(i);
+
+return bytes.buffer;
+}
+
+
+async function importPublicKey(){
+
+return crypto.subtle.importKey(
+"spki",
+pemToArrayBuffer(PUBLIC_KEY_PEM),
+{
+name:"ECDSA",
+namedCurve:"P-256"
+},
+false,
+["verify"]
+);
+}
+
+
+function stableCardData(card){
+
+return JSON.stringify({
+type:card.type,
+version:card.version,
+rank:card.rank,
+machine:card.machine,
+issued:card.issued,
+id:card.id
+});
+}
+
+
+async function verifyMachineCard(card){
+
+if(!card)
+throw new Error("No machine card.");
+
+if(card.type!=="AOC_KEYCARD")
+throw new Error(
+"This is not an AES on Crack key card."
+);
+
+if(card.version!==1)
+throw new Error(
+"Unsupported key card version."
+);
+
+if(
+!Number.isInteger(card.rank)||
+card.rank<1||
+card.rank>5
+)
+throw new Error(
+"Invalid machine rank."
+);
+
+if(
+typeof card.signature!=="string"||
+!card.signature
+)
+throw new Error(
+"Key card has no signature."
+);
+
+const key=await importPublicKey();
+
+const signature=fromB64(
+card.signature
+);
+
+const valid=await crypto.subtle.verify(
+{
+name:"ECDSA",
+hash:"SHA-256"
+},
+key,
+signature,
+enc.encode(
+stableCardData(card)
+)
+);
+
+if(!valid)
+throw new Error(
+"Key card signature is invalid."
+);
+
+return true;
+}
+
+
+async function loadMachineCard(file){
+
+try{
+
+const bytes=new Uint8Array(
+await file.arrayBuffer()
+);
+
+const card=JSON.parse(
+extractTextMetadata(
+bytes,
+CARD_META_KEY
+)
+);
+
+await verifyMachineCard(card);
+
+machineCard=card;
+
+updateRankDropdown();
+
+document.getElementById(
+"cardInfo"
+).innerHTML=
+"<b>STATUS:</b> VERIFIED<br>"+
+"<div class='rankBadge'>AOC-0"+
+card.rank+
+"</div>"+
+"<b>CLEARANCE:</b> "+
+RANKS[card.rank]+
+"<br><b>CARD:</b> "+
+card.id+
+"<br><b>ISSUED TO:</b> "+
+(card.issuedTo||"—");
+
+status(
+"Machine card verified: AOC-0"+
+card.rank+
+" — "+
+RANKS[card.rank]
+);
+
+}catch(e){
+
+machineCard=null;
+
+updateRankDropdown();
+
+document.getElementById(
+"cardInfo"
+).textContent=
+"Invalid machine card: "+e.message;
+
+status(
+"Machine card rejected: "+
+e.message,
+true
+);
+}
+}
+
+
+function clearCard(){
+
+machineCard=null;
+
+updateRankDropdown();
+
+document.getElementById(
+"cardInfo"
+).textContent=
+"No machine card loaded.";
+
+status(
+"Machine card removed."
+);
+}
+
+
+/* =========================
+   CARRIER PNG
+   ========================= */
+
+function isPng(bytes){
+return bytes.length>=8&&PNG_SIGNATURE.every(
+(x,i)=>bytes[i]===x
+);
+}
+
+
+async function loadCustomCarrier(file){
+
+try{
+
+const bytes=new Uint8Array(
+await file.arrayBuffer()
+);
+
+if(!isPng(bytes))
+throw new Error(
+"That file is not a valid PNG."
+);
+
+basePngBytes=bytes;
+
+document.getElementById(
+"carrierInfo"
+).innerHTML=
+"<b>CUSTOM:</b> "+
+file.name;
+
+status(
+"Custom PNG carrier loaded: "+
+file.name
+);
+
+}catch(e){
+
+status(
+"Could not load carrier: "+
+e.message,
+true
+);
+}
+}
+
+
+function clearCarrier(){
+
+basePngBytes=null;
+
+document.getElementById(
+"carrierInfo"
+).innerHTML=
+"<b>DEFAULT:</b> flippy.png";
+
+status(
+"Carrier reset. Loading flippy.png..."
+);
+
+loadBasePng();
+}
+
+
+/* =========================
+   ENCRYPT
+   ========================= */
+
+async function encrypt(){
+
+try{
+
+if(!machineCard)
+throw new Error(
+"A verified machine card is required."
+);
+
+const targetRank=Number(
+document.getElementById("targetRank").value
+);
+
+if(
+!allowedTargetRanks(machineCard.rank)
+.includes(targetRank)
+)
+throw new Error(
+"Your machine clearance does not allow this target rank."
+);
+
+status("Encrypting...");
+
+const text=document.getElementById(
+"input"
+).value;
+
+const word=document.getElementById(
+"wordKeyInput"
+).value;
+
+const chaos=chaosEncrypt(text);
+
+const key=await crypto.subtle.generateKey(
+{
+name:"AES-GCM",
+length:256
+},
+true,
+["encrypt","decrypt"]
+);
+
+const raw=new Uint8Array(
+await crypto.subtle.exportKey(
+"raw",
+key
+)
+);
+
+const salt=word
+?randomBytes(16)
+:null;
+
+const aesRaw=word
+?await deriveWordKey(
+raw,
+word,
+salt
+)
+:raw;
+
+const actual=await crypto.subtle.importKey(
+"raw",
+aesRaw,
+{name:"AES-GCM"},
+false,
+["encrypt"]
+);
+
+const iv=randomBytes(12);
+
+const ct=await crypto.subtle.encrypt(
+{
+name:"AES-GCM",
+iv
+},
+actual,
+enc.encode(chaos.step2)
+);
+
+const blob={
+version:4,
+ct:toB64(new Uint8Array(ct)),
+iv:toB64(iv),
+key:toB64(raw),
+wordProtected:!!word,
+salt:salt?toB64(salt):null,
+chaos,
+requiredRank:targetRank,
+issuerRank:machineCard.rank
+};
+
+const keyString=btoa(
+JSON.stringify(blob)
+);
+
+currentPayload=blob;
+loadedPayload=null;
+
+document.getElementById(
+"encrypted"
+).textContent=blob.ct;
+
+document.getElementById(
+"key"
+).textContent=keyString;
+
+document.getElementById(
+"keyInput"
+).value=keyString;
+
+status(
+word
+?"Encrypted for AOC-0"+
+targetRank+
+". Word Key is NOT stored in the PNG."
+:"Encrypted for AOC-0"+
+targetRank+
+". No Word Key used; PNG/key can decrypt."
+);
+
+}catch(e){
+
+status(
+"Encryption failed: "+
+e.message,
+true
+);
+}
+}
+
+
+/* =========================
+   DECRYPT
+   ========================= */
+
+async function decrypt(){
+
+try{
+
+status("Decrypting...");
+
+let p=loadedPayload||
+currentPayload;
+
+const raw=document
+.getElementById("keyInput")
+.value
+.trim();
+
+if(!p){
+
+if(!raw)
+throw new Error(
+"No key or PNG loaded."
+);
+
+p=JSON.parse(
+atob(raw)
+);
+}
+
+
+/* Old version compatibility */
+
+if(p.version<3&&p.jwk){
+
+const k=await crypto.subtle.importKey(
+"jwk",
+p.jwk,
+{name:"AES-GCM"},
+true,
+["decrypt"]
+);
+
+const plain=await crypto.subtle.decrypt(
+{
+name:"AES-GCM",
+iv:fromB64(p.iv)
+},
+k,
+fromB64(p.ct)
+);
+
+document.getElementById(
+"decrypted"
+).textContent=
+chaosDecrypt(
+dec.decode(plain),
+p.chaos
+);
+
+status(
+"Decrypted legacy payload."
+);
+
+return;
+}
+
+
+/* New rank system */
+
+if(
+p.requiredRank&&
+machineCard&&
+machineCard.rank>p.requiredRank
+)
+throw new Error(
+"Your machine clearance is too low for this message."
+);
+
+if(
+p.requiredRank&&
+!machineCard
+)
+throw new Error(
+"A verified machine card is required to decrypt this message."
+);
+
+const rawKey=await getAesKey(
+p,
+document.getElementById(
+"wordKeyInput"
+).value
+);
+
+const k=await crypto.subtle.importKey(
+"raw",
+rawKey,
+{name:"AES-GCM"},
+false,
+["decrypt"]
+);
+
+const plain=await crypto.subtle.decrypt(
+{
+name:"AES-GCM",
+iv:fromB64(p.iv)
+},
+k,
+fromB64(p.ct)
+);
+
+document.getElementById(
+"decrypted"
+).textContent=
+chaosDecrypt(
+dec.decode(plain),
+p.chaos
+);
+
+status(
+"Decrypted successfully."
+);
+
+}catch(e){
+
+document.getElementById(
+"decrypted"
+).textContent="";
+
+status(
+"You want decryption? Come back when you're a little... mmm... key-er.",
+true
+);
+}
+}
+
+
+/* =========================
+   DOWNLOAD ENCRYPTED PNG
+   ========================= */
+
+async function downloadCrack(){
+
+try{
+
+const p=currentPayload||loadedPayload;
+
+if(!p)
+throw new Error(
+"Nothing to download yet."
+);
+
+if(!basePngBytes)
+throw new Error(
+"PNG carrier is not loaded."
+);
+
+const out=insertBeforeIEND(
+basePngBytes,
+metadataChunk(
+JSON.stringify(p)
+)
+);
+
+const blob=new Blob(
+[out],
+{type:"image/png"}
+);
+
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+
+a.href=url;
+
+a.download="message.png";
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+setTimeout(
+()=>URL.revokeObjectURL(url),
+1000
+);
+
+status(
+"Encrypted PNG downloaded."
+);
+
+}catch(e){
+
+status(
+"PNG download failed: "+
+e.message,
+true
+);
+}
+}
+
+
+/* =========================
+   COPY
+   ========================= */
+
+function copyOutput(id){
+
+const text=
+document.getElementById(id)
+.innerText||"";
+
+if(
+navigator.clipboard&&
+window.isSecureContext
+)
+
+navigator.clipboard
+.writeText(text)
+.then(()=>status("Copied!"))
+.catch(()=>fallbackCopy(text));
+
+else
+fallbackCopy(text);
+}
+
+
+function fallbackCopy(text){
+
+const ta=document.createElement(
+"textarea"
+);
+
+ta.value=text;
+
+document.body.appendChild(ta);
+
+ta.select();
+
+try{
+
+document.execCommand("copy");
+
+status("Copied!");
+
+}catch(e){
+
+status(
+"Copy failed.",
+true
+);
+}
+
+ta.remove();
+}
+
+
+/* =========================
+   CLEAR
+   ========================= */
+
+function clearAll(){
+
+[
+"input",
+"wordKeyInput",
+"keyInput"
+].forEach(
+id=>document.getElementById(id).value=""
+);
+
+[
+"encrypted",
+"key",
+"decrypted"
+].forEach(
+id=>document.getElementById(id).textContent=""
+);
+
+currentPayload=null;
+loadedPayload=null;
+
+status("");
+}
+
+
+/* =========================
+   ENCRYPTED PNG DROPZONE
+   ========================= */
+
+const dz=
+document.getElementById(
+"dropZone"
+);
+
+const fi=
+document.getElementById(
+"crackFileInput"
+);
+
+dz.onclick=()=>fi.click();
+
+fi.onchange=e=>{
+
+if(e.target.files[0])
+loadPng(e.target.files[0]);
+
+e.target.value="";
+};
+
+dz.ondragover=e=>{
+
+e.preventDefault();
+
+dz.classList.add(
+"dragover"
+);
+};
+
+dz.ondragleave=()=>{
+
+dz.classList.remove(
+"dragover"
+);
+};
+
+dz.ondrop=e=>{
+
+e.preventDefault();
+
+dz.classList.remove(
+"dragover"
+);
+
+const f=e.dataTransfer.files[0];
+
+if(
+f&&
+(
+f.type==="image/png"||
+f.name.toLowerCase().endsWith(".png")
+)
+)
+
+loadPng(f);
+
+else
+
+status(
+"Please drop a PNG file.",
+true
+);
+};
+
+
+/* =========================
+   LOAD ENCRYPTED PNG
+   ========================= */
+
+async function loadPng(file){
+
+try{
+
+const bytes=new Uint8Array(
+await file.arrayBuffer()
+);
+
+const p=JSON.parse(
+extractTextMetadata(
+bytes,
+META_KEY
+)
+);
+
+if(!p.ct||!p.key)
+throw new Error(
+"Missing encrypted payload."
+);
+
+loadedPayload=p;
+currentPayload=p;
+
+document.getElementById(
+"encrypted"
+).textContent=p.ct;
+
+document.getElementById(
+"key"
+).textContent=
+btoa(JSON.stringify(p));
+
+document.getElementById(
+"keyInput"
+).value=
+btoa(JSON.stringify(p));
+
+status(
+p.requiredRank
+?"PNG loaded. Requires AOC-0"+
+p.requiredRank+
+" clearance."
+:
+p.wordProtected
+?"PNG loaded. Word Key required."
+:
+"PNG loaded. Embedded key available."
+);
+
+}catch(e){
+
+loadedPayload=null;
+
+status(
+"Invalid encrypted PNG: "+
+e.message,
+true
+);
+}
+}
+
+
+/* =========================
+   MACHINE CARD DROPZONE
+   ========================= */
+
+const cdz=
+document.getElementById(
+"cardDropZone"
+);
+
+const cfi=
+document.getElementById(
+"cardFileInput"
+);
+
+cdz.onclick=()=>cfi.click();
+
+cfi.onchange=e=>{
+
+if(e.target.files[0])
+loadMachineCard(
+e.target.files[0]
+);
+
+e.target.value="";
+};
+
+cdz.ondragover=e=>{
+
+e.preventDefault();
+
+cdz.classList.add(
+"dragover"
+);
+};
+
+cdz.ondragleave=()=>{
+
+cdz.classList.remove(
+"dragover"
+);
+};
+
+cdz.ondrop=e=>{
+
+e.preventDefault();
+
+cdz.classList.remove(
+"dragover"
+);
+
+const f=e.dataTransfer.files[0];
+
+if(
+f&&
+(
+f.type==="image/png"||
+f.name.toLowerCase().endsWith(".png")
+)
+)
+
+loadMachineCard(f);
+
+else
+
+status(
+"Please drop a PNG key card.",
+true
+);
+};
+
+
+/* =========================
+   CUSTOM CARRIER DROPZONE
+   ========================= */
+
+const carrierDz=
+document.getElementById(
+"carrierDropZone"
+);
+
+const carrierFi=
+document.getElementById(
+"carrierFileInput"
+);
+
+carrierDz.onclick=()=>carrierFi.click();
+
+carrierFi.onchange=e=>{
+
+if(e.target.files[0])
+loadCustomCarrier(
+e.target.files[0]
+);
+
+e.target.value="";
+};
+
+carrierDz.ondragover=e=>{
+
+e.preventDefault();
+
+carrierDz.classList.add(
+"dragover"
+);
+};
+
+carrierDz.ondragleave=()=>{
+
+carrierDz.classList.remove(
+"dragover"
+);
+};
+
+carrierDz.ondrop=e=>{
+
+e.preventDefault();
+
+carrierDz.classList.remove(
+"dragover"
+);
+
+const f=e.dataTransfer.files[0];
+
+if(
+f&&
+(
+f.type==="image/png"||
+f.name.toLowerCase().endsWith(".png")
+)
+)
+
+loadCustomCarrier(f);
+
+else
+
+status(
+"Please drop a PNG carrier.",
+true
+);
+};
+
+
+/* =========================
+   DEFAULT FLIPPY PNG
+   ========================= */
+
+async function loadBasePng(){
+
+try{
+
+const r=await fetch(
+"https://cdn.jsdelivr.net/gh/formerlegend3323/cool_aes@main/flippy.png",
+{cache:"no-store"}
+);
+
+if(!r.ok)
+throw new Error();
+
+basePngBytes=
+new Uint8Array(
+await r.arrayBuffer()
+);
+
+if(
+!PNG_SIGNATURE.every(
+(x,i)=>basePngBytes[i]===x
+)
+)
+throw new Error();
+
+document.getElementById(
+"carrierInfo"
+).innerHTML=
+"<b>DEFAULT:</b> flippy.png";
+
+status(
+"flippy.png loaded."
+);
+
+}catch(e){
+
+basePngBytes=null;
+
+document.getElementById(
+"carrierInfo"
+).innerHTML=
+"<b>DEFAULT:</b> flippy.png (FAILED TO LOAD)";
+
+status(
+"Could not load flippy.png from the CDN.",
+true
+);
+}
+}
+
+
+/* =========================
+   STARTUP
+   ========================= */
+
+updateRankDropdown();
+loadBasePng();
+
+</script>
+
+</body>
+</html>
     ]]></metadata>
 
     <script><![CDATA[
