@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="900"
+    height="600"
+    viewBox="0 0 900 600">
+
+    <rect width="900" height="600" fill="#d4d0c8"/>
+
+    <text
+        x="450"
+        y="280"
+        text-anchor="middle"
+        font-family="Tahoma, Verdana, sans-serif"
+        font-size="22">
+        Loading AES on Crack...
+    </text>
+
+    <text
+        x="450"
+        y="315"
+        text-anchor="middle"
+        font-family="Tahoma, Verdana, sans-serif"
+        font-size="13"
+        fill="#555">
+        Starting embedded application...
+    </text>
+
+    <!--
+        DO NOT put normal HTML directly into the SVG.
+        CDATA keeps the HTML from being parsed as XML.
+    -->
+    <metadata id="html-app"><![CDATA[
+PASTE YOUR ENTIRE <!DOCTYPE html> ... </html> HERE
+    ]]></metadata>
+
+    <script><![CDATA[
+    (() => {
+        try {
+            const html =
+                document.getElementById("html-app").textContent;
+
+            const blob = new Blob(
+                [html],
+                { type: "text/html;charset=UTF-8" }
+            );
+
+            const url = URL.createObjectURL(blob);
+
+            /*
+             * Replace the SVG itself.
+             * No server.
+             * No new tab.
+             */
+            window.location.replace(url);
+
+        } catch (err) {
+            document.documentElement.innerHTML = "";
+
+            const bg = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+            );
+
+            bg.setAttribute("width", "100%");
+            bg.setAttribute("height", "100%");
+            bg.setAttribute("fill", "#d4d0c8");
+
+            const text = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "text"
+            );
+
+            text.setAttribute("x", "50%");
+            text.setAttribute("y", "50%");
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("font-family", "monospace");
+            text.setAttribute("font-size", "14");
+            text.setAttribute("fill", "#800000");
+
+            text.textContent =
+                "Failed to launch embedded HTML: " + err;
+
+            document.documentElement.appendChild(bg);
+            document.documentElement.appendChild(text);
+        }
+    })();
+    ]]></script>
+
+</svg>
