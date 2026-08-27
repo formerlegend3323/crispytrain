@@ -1,220 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-     width="100%"
-     height="100%"
-     viewBox="0 0 800 600">
+     width="600"
+     height="450"
+     viewBox="0 0 600 450">
 
-  <foreignObject x="0" y="0" width="100%" height="100%">
-    <xhtml:html>
-      <xhtml:head>
-        <xhtml:meta charset="UTF-8"/>
-        <xhtml:meta name="viewport"
-                    content="width=device-width, initial-scale=1.0"/>
+    <foreignObject x="0" y="0" width="600" height="450">
+        <xhtml:div xmlns="http://www.w3.org/1999/xhtml"
+                  style="width:100%;height:100%;font-family:Arial,sans-serif;">
 
-        <xhtml:style>
-          html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-          }
+            <xhtml:div id="launcher"
+                       style="
+                           width:100%;
+                           height:100%;
+                           display:flex;
+                           align-items:center;
+                           justify-content:center;
+                           background:#f7f7f7;
+                       ">
 
-          body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f7f7f7;
-          }
+                <xhtml:div id="dropZone"
+                           style="
+                               width:340px;
+                               padding:25px;
+                               text-align:center;
+                               background:white;
+                               border:2px dashed #007BFF;
+                               border-radius:10px;
+                           ">
 
-          .container {
-            text-align: center;
-            border: 2px dashed #007BFF;
-            padding: 20px;
-            width: 300px;
-            background-color: #fff;
-            box-sizing: border-box;
-          }
+                    <xhtml:p>
+                        Drag &amp; Drop HTML File Here
+                    </xhtml:p>
 
-          .container p {
-            font-size: 16px;
-            color: #333;
-          }
+                    <xhtml:input
+                        id="fileInput"
+                        type="file"
+                        accept=".html,.htm,text/html"/>
 
-          .container input {
-            margin-top: 20px;
-          }
+                    <xhtml:br/>
+                    <xhtml:br/>
 
-          .btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-          }
+                    <xhtml:button id="openBtn">
+                        Run HTML
+                    </xhtml:button>
 
-          .btn:hover {
-            background-color: #0056b3;
-          }
-        </xhtml:style>
-      </xhtml:head>
+                    <xhtml:p id="status"
+                             style="font-size:13px;color:#666;">
+                        No file selected
+                    </xhtml:p>
 
-      <xhtml:body>
+                </xhtml:div>
+            </xhtml:div>
 
-        <xhtml:div class="container" id="drop-zone">
-
-          <xhtml:p>
-            Drag &amp; Drop HTML File Here
-          </xhtml:p>
-
-          <xhtml:input
-            type="file"
-            id="fileInput"
-            accept=".html,text/html"/>
-
-          <xhtml:button
-            class="btn"
-            id="openBtn">
-            Open in New Tab
-          </xhtml:button>
+            <!-- Uploaded HTML gets rendered here -->
+            <xhtml:div id="app"
+                       style="
+                           display:none;
+                           width:100%;
+                           height:100%;
+                           overflow:auto;
+                       ">
+            </xhtml:div>
 
         </xhtml:div>
+    </foreignObject>
 
-      </xhtml:body>
-    </xhtml:html>
-  </foreignObject>
+    <script><![CDATA[
 
-  <script type="application/ecmascript"><![CDATA[
+        const fileInput =
+            document.getElementById("fileInput");
 
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('fileInput');
-    const openBtn = document.getElementById('openBtn');
+        const openBtn =
+            document.getElementById("openBtn");
 
-    let htmlContent = '';
+        const launcher =
+            document.getElementById("launcher");
 
-    function readFile(file) {
+        const app =
+            document.getElementById("app");
 
-      const reader = new FileReader();
+        const status =
+            document.getElementById("status");
 
-      reader.onload = function(e) {
+        let htmlContent = "";
 
-        htmlContent = e.target.result;
+        fileInput.addEventListener("change", async (event) => {
 
-        console.log('File read successfully');
+            const file = event.target.files[0];
 
-      };
+            if (!file) return;
 
-      reader.onerror = function() {
+            htmlContent = await file.text();
 
-        htmlContent = '';
+            status.textContent =
+                "Loaded: " + file.name;
+        });
 
-        alert('Could not read the HTML file.');
 
-      };
+        openBtn.addEventListener("click", async () => {
 
-      reader.readAsText(file);
+            if (!htmlContent) {
+                alert("Select an HTML file first.");
+                return;
+            }
 
-    }
+            /*
+             * Parse the uploaded HTML.
+             */
+            const parser = new DOMParser();
 
-    dropZone.addEventListener('dragover', (e) => {
+            const parsed =
+                parser.parseFromString(
+                    htmlContent,
+                    "text/html"
+                );
 
-      e.preventDefault();
 
-      dropZone.style.borderColor = '#0056b3';
+            /*
+             * Copy the HTML body into our SVG app.
+             */
+            app.innerHTML = parsed.body.innerHTML;
 
-    });
 
-    dropZone.addEventListener('dragleave', () => {
+            /*
+             * Copy the CSS from the uploaded document.
+             */
+            for (const style of parsed.querySelectorAll("style")) {
 
-      dropZone.style.borderColor = '#007BFF';
+                const newStyle =
+                    document.createElementNS(
+                        "http://www.w3.org/1999/xhtml",
+                        "style"
+                    );
 
-    });
+                newStyle.textContent =
+                    style.textContent;
 
-    dropZone.addEventListener('drop', (e) => {
+                app.prepend(newStyle);
+            }
 
-      e.preventDefault();
 
-      dropZone.style.borderColor = '#007BFF';
+            /*
+             * Show the application.
+             */
+            launcher.style.display = "none";
+            app.style.display = "block";
 
-      const file = e.dataTransfer.files[0];
 
-      if (
-        file &&
-        (
-          file.type === 'text/html' ||
-          file.name.toLowerCase().endsWith('.html')
-        )
-      ) {
+            /*
+             * Execute scripts from the uploaded HTML.
+             */
+            for (const oldScript of
+                 parsed.querySelectorAll("script")) {
 
-        readFile(file);
+                const script =
+                    document.createElementNS(
+                        "http://www.w3.org/1999/xhtml",
+                        "script"
+                    );
 
-      } else {
+                if (oldScript.src) {
+                    script.src = oldScript.src;
+                } else {
+                    script.textContent =
+                        oldScript.textContent;
+                }
 
-        alert('Please drop an HTML file.');
+                document.documentElement.appendChild(script);
+            }
 
-      }
+        });
 
-    });
-
-    fileInput.addEventListener('change', (e) => {
-
-      const file = e.target.files[0];
-
-      if (
-        file &&
-        (
-          file.type === 'text/html' ||
-          file.name.toLowerCase().endsWith('.html')
-        )
-      ) {
-
-        readFile(file);
-
-      }
-
-    });
-
-    openBtn.addEventListener('click', () => {
-
-      if (!htmlContent) {
-
-        alert('Please upload an HTML file first.');
-
-        return;
-
-      }
-
-      /*
-       * Create a temporary HTML document.
-       * The browser loads this as its own document,
-       * rather than trying to render the HTML inside the SVG.
-       */
-     const url = "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent);
-const newTab = window.open(url, "_blank");
-
-      if (!newTab) {
-
-        URL.revokeObjectURL(url);
-
-        alert('Please allow popups for this site.');
-
-        return;
-
-      }
-
-      /*
-       * Keep the Blob URL alive long enough for the
-       * new document to load.
-       */
-      setTimeout(() => {
-
-        URL.revokeObjectURL(url);
-
-      }, 60000);
-
-    });
-
-  ]]></script>
+    ]]></script>
 
 </svg>
